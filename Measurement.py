@@ -1,35 +1,26 @@
 """
-* RATING PRODUCTS:
-- Average
-- Time-Based Weighted Average
-- User-Based Weighted Average
-- Weighted Rating
-- Bayesian Average Rating Score
+Ölçme problemlerini çözme yöntemleri
 
-* SORTING PRODUCTS:
-- Sorting by Rating
-- Sorting by Comment Count or Purchase Count
-- Sorting by Rating, Comment and Purchase
-- Sorting by Bayesian Average Rating Score (Sorting Products with 5 star Rated)
-- Hybrid Sorting: Bar Score + Diğer Faktörler
+* RATING PRODUCTS (ÜRÜN PUANLARININ HESAPLANMASI):
+- Average (Ortalama)
+- Time-Based Weighted Average (Puan zamanlarına göre ağırlıklı ortalama)
+- User-Based Weighted Average (Kullanıcı temelli ağırlıklı ortalama)
+- Weighted Rating (Ağırlıklı derecelendirme)
 
+* SORTING PRODUCTS (ÜRÜNLERİN SIRALANMASI:
+- Sorting by Rating (Derecelendirmeye göre sıralama)
+- Sorting by Comment Count or Purchase Count (yorum ve satın alma sayısına göre sıralama)
+- Sorting by Rating, Comment and Purchase (Derecelendirme, satın alma, yoruma göre sıralama)
+- Sorting by Bayesian Average Rating Score (Sorting Products with 5 star Rated) (Bayes ortalama derecelendirme puanı)
+- Hybrid Sorting: Bar Score + Diğer Faktörler (Karma sıralama)
 
- * SORTING REVIEWS:
-- Up-Down Difference Score
-- Average Rating
-- Wilson Lower Bound Score
-
-""""
+* SORTING REVIEWS (KULLANICI YORUMLARININ SIRALANMASI):
+- Up-Down Difference Score (Üst-Alt farkı skoru)
+- Average Rating (Ortalama Puanı)
+- Wilson Lower Bound Score (Wilson Alt Sınır Puanı)
 
 """
-Kullanıcı ve zaman ağırlıklı kurs puanı hesaplama
-(50+ saat) Python A-Z: Veri Bilimi ve Machine Learning
-Puan: 4.8 (4.764925)
-Toplam Puan: 4611
-Puan Yüzdeleri: 75, 20, 4, 1, <1
-Yaklaşık Sayısal Karşılıkları: 3458, 922, 184, 46, 6
 
-"""
 # ****************************** RATING PRODUCTS **************************************************
 # kütüphane importlarını yapalım:
 import pandas as pd
@@ -45,7 +36,7 @@ pd.set_option('display.float_format', lambda x: '%.5f' % x)
 
 df = pd.read_csv("dataset/course_reviews.csv")
 df.head()
-# verisetinde; kişilerin puanları, üye olma tarihi, sorduğu ve aldığı cevapların yüzdesi bulunmakta
+# verisetinde; kişilerin puanları, üye olma tarihi, sorduğu ve aldığı cevapların yüzdesi bulunmaktadır.
 
 df.shape
 
@@ -60,7 +51,7 @@ df.groupby("Questions Asked").agg({"Questions Asked": "count",
 
 # AVERAGE
 df["Rating"].mean()
-# puan ortalam puanını hesapladık. ancak memnuniyeti de değerlendirmeliyiz bunu da puana yansıtmalıyız.
+# puan ortalama puanını hesapladık. Ancak memnuniyeti de değerlendirmeliyiz bunu da puana yansıtmalıyız.
 
 # 1. TIME-BASED WEIGHTED AVERAGE
 # Puan zamanlarına göre ağırlıklı ortalama hesaplarsak daha doğru bir puanlama yapmış oluruz.
