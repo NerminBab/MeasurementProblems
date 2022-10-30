@@ -14,6 +14,11 @@
 - Hybrid Sorting: Bar Score + Diğer Faktörler
 
 
+ * SORTING REVIEWS:
+- Up-Down Difference Score
+- Average Rating
+- Wilson Lower Bound Score
+
 """"
 
 """
@@ -25,7 +30,7 @@ Puan Yüzdeleri: 75, 20, 4, 1, <1
 Yaklaşık Sayısal Karşılıkları: 3458, 922, 184, 46, 6
 
 """
-# *************************** RATING PRODUCTS **************************************************
+# ****************************** RATING PRODUCTS **************************************************
 # kütüphane importlarını yapalım:
 import pandas as pd
 import math
@@ -136,7 +141,7 @@ course_weighted_rating(df)
 course_weighted_rating(df, time_w=40,
                        user_w=60)  # ilerleme yüzdelerine göre kullanıcıların verdiği puanları önceliklendirdik
 
-# ************************************* SORTING PRODUCTS **************************************************
+# *************************************** SORTING PRODUCTS **************************************************
 # SORTING BY RATING
 # Kurs Sıralama:
 import pandas as pd
@@ -241,3 +246,79 @@ df["hybrid_sorting_score"] = hybrid_sorting_score(df)
 df.sort_values("hybrid_sorting_score", ascending=False).head(20)
 
 df[df["course_name"].str.contains("Veri Bilimi")].sort_values("hybrid_sorting_score", ascending=False).head(20)
+
+
+# ***************************** SORTING REVİEWS ****************************************************
+# SORTING REVIEWS
+
+# Yorumların sıralanması verilen puandan bağımsızdır, çünkü önemli olan social proof un yansıtılmasıdır. İş bilgisinin yanında user quality score da dikkate alınır.
+
+# UP-DOWN DIFFERENCE SCORE = up rating - down rating:
+# Review 1: 600 up, 400 down, total 1000
+# Review 2: 5500 up, 4500 down, total 10000
+
+def score_up_down_diff(up,down):
+    return up-down
+
+# Review 1:
+score_up_down_diff(600, 400)
+
+# Review 2:
+score_up_down_diff(5500, 4500)
+
+# Yüzdeleri hesaba bakılmadığı için bu yöntem eksiktir, yanlılık barındıdır.
+
+
+# AVERAGE RATING = up rating / all rating:
+def score_average_rating(up, down):
+    if up+down == 0:
+        return 0
+    return up/(up+down)
+
+score_average_rating(600, 400)
+score_average_rating(5500, 4500)
+# up-down difference score hesabından farklı ancak daha akla yatkın
+
+#yeni bir senaryo üzerinden gidelim:
+# Review 1: 2 up, 0 down, total 2
+# Review 2: 100 up, 1 down, total 101
+
+score_average_rating(2, 0)
+score_average_rating(100,1)
+# bu yöntem de frekans bilgilerini dikkate almadığı için yetersiz kalmıştır.
+
+
+
+# WILSON ALT SINIR PUANI (WILSON LOWER BOUND SCORE):
+# Bu yöntem ikili interaction barındıran durumları skorlamayı sağlar. Olayın gözlenmesi ile ilgili olasılık dağılımı
+# Olasılık ile örneklem içinden genelleme yaparak kitleye yansıtabiliriz.
+
+# bir önceki örenekte 600 up, 400 down örneğinde up oranı 0.6 dır, güven ararlığı 0.5-0.7 aralığındadır.
+# istatistiksel olarak 100 kullanıcıdan 95 inin %5 hata payı olmakla birlikte yorumun up oranı 0.5 ile 0.7 arasında olacaktır.
+
+def wilson_lower_bound(up, down, confidence=0.95):
+    """
+    Wilson Lower Bound Score Hesaplama
+    -Bernoulli parametresi p için hesaplanacak güven aralığının alt sınırı WLB skoru olarak kabul edilir.
+    -Hesaplanacak skor ürün sıralaması için kullanılır.
+    :param up: int
+    :param down: int
+    :param confidence: float
+    :return: wilson score: float
+    """
+    n = up+down
+    if n == 0:
+        return 0
+    z = st.norm.ppf(1-(1-confidence)/2)
+    phat = 1.0*up/n
+    return (phat+z*z/(2*n)-z*math.sqrt((phat*(1-phat)+z*z/(4*n))/n))/(1+z*z/n)
+
+wilson_lower_bound(600, 400)
+wilson_lower_bound(5500, 4500)
+
+wilson_lower_bound(2, 0)
+wilson_lower_bound(100, 1)
+# Bu sonuçlar akla daha yatkın. %95 güven ve %5 hata payı ile hesaplamış olduk.
+
+# NOT: Eğer skorlar 1-5 arasındaysa 1-3 arasına negatif, 4-5 e pozitif değer verilerek binary hale getirilip bernoulliye uygun şekle getirilip WLB uygulanabilir. Ancak böyleyapmak beraberinde bazı problemleri getirebilir bu sebeple bayesian average rating yapmak daha uygun olur.
+
