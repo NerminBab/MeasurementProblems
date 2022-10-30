@@ -277,6 +277,7 @@ def score_average_rating(up, down):
 
 score_average_rating(600, 400)
 score_average_rating(5500, 4500)
+
 # up-down difference score hesabından farklı ancak daha akla yatkın
 
 #yeni bir senaryo üzerinden gidelim:
@@ -321,4 +322,4 @@ wilson_lower_bound(100, 1)
 # Bu sonuçlar akla daha yatkın. %95 güven ve %5 hata payı ile hesaplamış olduk.
 
 # NOT: Eğer skorlar 1-5 arasındaysa 1-3 arasına negatif, 4-5 e pozitif değer verilerek binary hale getirilip bernoulliye uygun şekle getirilip WLB uygulanabilir. Ancak böyleyapmak beraberinde bazı problemleri getirebilir bu sebeple bayesian average rating yapmak daha uygun olur.
-
+# WLB yöntemi yalnızca pozitif yorumları dikkate alırken BAR yöntemi K skalasında bütün oyları dikkate alır.
